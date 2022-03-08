@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <setting name="logImpl" value="log4j"/>
+    </settings>
+
+    <typeAliases>
+        <package name="com.lanou.bean"/>
+    </typeAliases>
+
+    <plugins>
+        <!-- com.github.pagehelper为PageHelper类所在包名 -->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!-- 如果pageNum超出合法范围，是否返回正确结果 -->
+            <property name="reasonable" value="true"/>
+            <!-- 如果pageSize传入0，是否返回所有数据（不分页） -->
+            <property name="pageSizeZero" value="true"/>
+        </plugin>
+    </plugins>
+
+    <mappers>
+        <package name="com.lanou.mapper"/>
+    </mappers>
+</configuration>

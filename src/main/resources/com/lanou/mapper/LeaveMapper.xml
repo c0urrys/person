@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lanou.mapper.LeaveMapper">
+    <select id="listAll" resultType="Leave">
+        select leave_inf.*, employee_inf.name as empname,
+               job_inf.name as jobname,dept_inf.name as deptname,
+               leavetype_inf.name as leavetypename,leavestatus_inf.name as leavestatusname
+               from leave_inf
+            left join employee_inf on employee_inf.id = leave_inf.emp_id
+            left join job_inf on job_inf.id = leave_inf.job_id
+            left join dept_inf on dept_inf.id = leave_inf.dept_id
+            left join leavetype_inf on leavetype_inf.id = leave_inf.dept_id
+            left join leavestatus_inf on leavestatus_inf.id = leave_inf.dept_id
+
+        <where>
+            <if test="name!=null and name != ''">
+                empname like concat('%',#{name},'%') or jonname like concat('%',#{name},'%')
+            </if>
+        </where>
+
+    </select>
+
+    <select id="findById" resultType="Leave">
+        select * from leave_inf where id = #{id}
+    </select>
+
+
+    <update id="update">
+        update leave_inf set leavedays = #{leavedays},leavetype = #{leavetype},leavestatus = #{leavestatus}
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from leave_inf where id = #{id}
+    </delete>
+
+</mapper>

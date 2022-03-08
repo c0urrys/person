@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lanou.mapper.TrainMapper">
+    <select id="listAll" resultType="Train">
+        select train_inf.*, employee_inf.name as empname,job_inf.name as jobname,
+               dept_inf.name as deptname,completion_inf.name as completionname
+               from train_inf
+            left join employee_inf on employee_inf.id = train_inf.emp_id
+            left join job_inf on job_inf.id = train_inf.job_id
+            left join dept_inf on dept_inf.id = train_inf.dept_id
+            left join completion_inf on completion_inf.id = train_inf.completion
+        <where>
+            <if test="name!=null and name != ''">
+                empname like concat('%',#{name},'%') or jonname like concat('%',#{name},'%')
+            </if>
+        </where>
+
+    </select>
+
+    <select id="findById" resultType="Train">
+        select * from train_inf where id = #{id}
+    </select>
+
+    <insert id="insert">
+        insert into train_inf
+            (emp_id,content,startdata,enddata,job_id,dept_id,totallength,completion,grade)
+        values
+         (#{emp_id},#{content},#{startdata},#{enddata},#{job_id},#{dept_id},#{totallength},#{completion},#{grade})
+    </insert>
+
+    <update id="update">
+        update train_inf set content = #{content},startdata = #{startdata},
+        enddata = #{enddata},totallength = #{totallength},completion = #{completion},grade = #{grade}
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from train_inf where id = #{id}
+    </delete>
+
+</mapper>

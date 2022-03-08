@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lanou.mapper.NoticeMapper">
+    <select id="listAll" resultMap="map1">
+        select notice_inf.*, user_inf.username  from notice_inf
+            left join user_inf on notice_inf.user_id = user_inf.id
+        <where>
+            <if test="name!=null and name != ''">
+                title like concat('%',#{name},'%') or content like concat('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+    <resultMap id="map1" type="Notice">
+        <id property="id" column="id"></id>
+        <result property="title" column="title"></result>
+        <result property="content" column="content"></result>
+        <result property="createdate" column="createdate"></result>
+        <result property="username" column="username"></result>
+    </resultMap>
+
+    <select id="findById" resultType="Notice">
+        select * from notice_inf where id = #{id}
+    </select>
+
+    <insert id="add">
+        insert into notice_inf (title,content)
+        values (#{title},#{content})
+    </insert>
+
+    <update id="update">
+        update notice_inf set title = #{title},content = #{content},createdate = #{createdate},user_id = #{user_id}
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from notice_inf where id = #{id}
+    </delete>
+
+</mapper>

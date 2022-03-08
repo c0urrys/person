@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lanou.mapper.EmployeeMapper">
+    <select id="listAll" resultMap="map1">
+        select employee_inf.*,
+               user_inf.username as name1, user_inf.email as email1,
+               education_inf.name as name2,
+               dept_inf.name as name3,
+               job_inf.name as name4
+               from employee_inf
+        left join user_inf on employee_inf.user_id = user_inf.id
+        left join education_inf on employee_inf.education_id = education_inf.id
+        left join dept_inf on employee_inf.dept_id = dept_inf.id
+        left join job_inf on employee_inf.job_id = job_inf.id
+        <where>
+            <if test="name!=null and name != ''">
+                employee_inf.name like concat('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+    <resultMap id="map1" type="Emp">
+        <id property="id" column="id"></id>
+        <result property="name" column="name"></result>
+        <result property="phone" column="phone"></result>
+        <result property="card_id" column="card_id"></result>
+        <result property="address" column="address"></result>
+        <result property="createdate" column="createdate"></result>
+        <result property="username" column="name1"></result>
+        <result property="useremail" column="email1"></result>
+        <result property="educationname" column="name2"></result>
+        <result property="jobname" column="name4"></result>
+        <result property="deptname" column="name3"></result>
+    </resultMap>
+
+    <select id="findById" resultType="Emp">
+        select * from employee_inf where id = #{id}
+    </select>
+
+    <select id="findByName" resultType="Emp">
+        select * from employee_inf where name = #{name}
+    </select>
+
+    <insert id="insert">
+        insert into dept_inf (name,remark) values (#{name},#{remark})
+    </insert>
+
+    <update id="update">
+        update employee_inf set
+        dept_id = #{dept_id}, job_id = #{job_id}, name = #{name}, card_id = #{card_id},
+        address = #{address}, phone = #{phone}, sex_id = #{sex_id}, education_id = #{education_id}
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from employee_inf where id = #{id}
+    </delete>
+
+    <insert id="add">
+        insert into employee_inf(dept_id,job_id,name,card_id,address,phone,sex_id,education_id)
+        values (#{dept_id},#{job_id},#{name},#{card_id},#{address},#{phone},#{sex_id},#{education_id})
+    </insert>
+
+    <insert id="addList">
+        insert into employee_inf(dept_id,job_id,name,card_id,address,phone,sex_id,education_id)
+        values
+        <foreach collection="list" separator="," item="d">
+            (#{d.dept_id},#{d.job_id},#{d.name},#{d.card_id},
+             #{d.address},#{d.phone},#{d.sex_id},#{d.education_id})
+        </foreach>
+    </insert>
+
+</mapper>

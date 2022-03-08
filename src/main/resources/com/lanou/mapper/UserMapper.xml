@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lanou.mapper.UserMapper">
+    <select id="findUserByName" resultType="User">
+        select * from user_inf where loginname = #{loginname}
+    </select>
+
+    <select id="findUserById" resultMap="map1">
+        select user_inf.*,status_inf.* from user_inf
+        left join status_inf on user_inf.id = status_inf.id
+        where user_inf.id = #{id}
+    </select>
+    <resultMap id="map1" type="User" autoMapping="true">
+        <id property="id" column="id"></id>
+        <collection property="statusList" ofType="Status" autoMapping="true">
+            <id property="id" column="id"></id>
+        </collection>
+
+    </resultMap>
+
+    <select id="listAll" resultType="User">
+        select * from user_inf
+    <where>
+            <if test="name!=null and name != ''">
+                loginname like concat('%',#{loginname},'%') or username like concat('%',#{username},'%')
+            </if>
+
+    </where>
+    </select>
+
+    <select id="findCount" resultType="int">
+        select count(*) from user_inf
+    </select>
+
+    <insert id="addUser">
+        insert into user_inf (loginname,password,email,username,emp_id)
+        values (#{loginname},#{password},#{email},#{username},#{emp_id})
+    </insert>
+
+    <update id="update">
+        update  user_inf set
+        loginname = #{loginname},username = #{username},password = #{password},status_id = #{status_id}
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from user_inf where id = #{id}
+    </delete>
+</mapper>

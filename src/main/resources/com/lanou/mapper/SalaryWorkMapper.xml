@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lanou.mapper.SalaryMapper">
+    <select id="listAll" resultType="Salary">
+        select salary_inf.*, employee_inf.name as empname,job_inf.name as jobname,dept_inf.name as deptname
+               from salary_inf
+            left join employee_inf on employee_inf.id = salary_inf.emp_id
+            left join job_inf on job_inf.id = salary_inf.job_id
+            left join dept_inf on dept_inf.id = salary_inf.dept_id
+        <where>
+            <if test="name!=null and name != ''">
+                empname like concat('%',#{name},'%') or jonname like concat('%',#{name},'%')
+            </if>
+        </where>
+
+    </select>
+
+    <select id="findById" resultType="Salary">
+        select * from salary_inf where id = #{id}
+    </select>
+
+    <insert id="add">
+        insert into salary_inf
+            (emp_id,salary_station,salary_level,seniority_pay,performance,
+             individual_income,job_id,dept_id)
+        values
+         (#{emp_id},#{salary_station},#{salary_level},#{seniority_pay},#{performance},
+          individual_income,#{job_id},#{dept_id})
+    </insert>
+
+    <update id="update">
+        update salary_inf set salary_station = #{salary_station},
+            salary_level = #{salary_level},seniority_pay = #{seniority_pay},
+            performance = #{performance},individual_income = #{individual_income}
+        where id = #{id}
+    </update>
+
+</mapper>

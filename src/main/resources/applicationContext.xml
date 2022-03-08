@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+         https://www.springframework.org/schema/context/spring-context.xsd
+          http://mybatis.org/schema/mybatis-spring
+           http://mybatis.org/schema/mybatis-spring.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd
+           http://www.springframework.org/schema/aop
+           https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+<!--    定义spring注解扫描的包-->
+    <context:component-scan base-package="com.lanou"></context:component-scan>
+
+    <!-- 指定属性配置文件的位置 -->
+    <context:property-placeholder location="classpath:db.properties"></context:property-placeholder>
+
+    <!-- 创建数据源 -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+
+<!--    创建SqlSessionFactoryBean-->
+    <bean id="sessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+<!--        指定mybatis配置文件位置-->
+<!--        <property name="configLocation" value="classpath:mybatis-config.xml"></property>-->
+        <property name="mapperLocations" value="classpath:/com/lanou/mapper/*.xml"></property>
+        <property name="typeAliasesPackage" value="com.lanou.bean"></property>
+<!--        等价于settings设置-->
+        <property name="configuration">
+            <bean class="org.apache.ibatis.session.Configuration">
+<!--                <property name="mapUnderscoreToCamelCase" value="true"></property>-->
+<!--                启用二级缓存-->
+                <property name="cacheEnabled" value="true"></property>
+                <property name="logImpl" value="org.apache.ibatis.logging.log4j.Log4jImpl"></property>
+            </bean>
+        </property>
+        <property name="plugins">
+<!--            分页插件-->
+            <list>
+                <bean class="com.github.pagehelper.PageInterceptor"></bean>
+            </list>
+        </property>
+    </bean>
+
+<!--    定义mybatis扫描的接口-->
+    <mybatis:scan base-package="com.lanou.mapper"></mybatis:scan>
+
+    <!--    定义事务管理bean对象-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+<!--        事务切面-->
+    <tx:advice id="transactionInterceptor" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="save*"/>
+        </tx:attributes>
+    </tx:advice>
+    <!--    <tx:annotation-driven transaction-manager="transactionManager">-->
+    <!--        -->
+    <!--    </tx:annotation-driven>-->
+
+    <!--    事务切面和切入点关联-->
+    <aop:config>
+        <aop:pointcut id="pt1" expression="execution(* com.lanou.service.*.*(..))"/>
+        <aop:advisor advice-ref="transactionInterceptor" pointcut-ref="pt1"></aop:advisor>
+    </aop:config>
+<!--    创建自定义数据源的bean对象-->
+    <bean id="myRealm" class="com.lanou.shiro.MyRealm">
+<!--        指定凭证匹配器-->
+        <property name="credentialsMatcher" ref="hashedCredentialsMatcher"></property>
+    </bean>
+
+    <bean id="hashedCredentialsMatcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+        <property name="hashAlgorithmName" value="md5"></property>
+        <property name="hashIterations" value="2"></property>
+    </bean>
+<!--    安全管理器-->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+<!--        指定自定义的realm数据源（重写了认证方法和授权方法）-->
+        <property name="realm" ref="myRealm"></property>
+    </bean>
+
+    <!--shiro 过滤器  -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!--安全管理器-->
+        <property name="securityManager" ref="securityManager"></property>
+
+<!--        <property name="filterChainDefinitions">-->
+<!--            <value>  &lt;!&ndash; anon:匿名访问 user:登录后可访问，包含记住功能，authc登录成功后可访问  等号两边加空格&ndash;&gt;-->
+<!--                /login = anon-->
+<!--                /register = anon-->
+<!--                /js/** = anon-->
+<!--                /index.jsp = user-->
+<!--                /** = user-->
+
+<!--&lt;!&ndash;                /king/t1 = roles["admin"]  拥有admin角色可访问-->
+<!--                    /king/t2 = perms["user:findAll"] 拥有指定菜单可访问-->
+<!--&ndash;&gt;-->
+<!--            </value>-->
+<!--        </property>-->
+    </bean>
+
+
+</beans>

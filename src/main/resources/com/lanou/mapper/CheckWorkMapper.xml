@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lanou.mapper.CheckWorkMapper">
+    <select id="listAll" resultType="CheckWork">
+        select checkwork_inf.*, employee_inf.name as empname,job_inf.name as jobname,dept_inf.name as deptname
+               from checkwork_inf
+            left join employee_inf on employee_inf.id = checkwork_inf.emp_id
+            left join job_inf on job_inf.id = checkwork_inf.job_id
+            left join dept_inf on dept_inf.id = checkwork_inf.dept_id
+        <where>
+            <if test="name!=null and name != ''">
+                empname like concat('%',#{name},'%') or jonname like concat('%',#{name},'%')
+            </if>
+        </where>
+
+    </select>
+
+    <select id="findById" resultType="CheckWork">
+        select * from checkwork_inf where id = #{id}
+    </select>
+
+    <insert id="add">
+        insert into checkwork_inf (emp_id,workingdays,daysleave,daysout,job_id,dept_id) values
+        (#{emp_id},#{workingdays},#{daysleave},#{daysout},#{job_id},#{dept_id})
+    </insert>
+
+    <update id="update">
+        update checkwork_inf set workingdays = #{workingdays},daysleave = #{daysleave},daysout = #{daysout}
+        where id = #{id}
+    </update>
+
+</mapper>

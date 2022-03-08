@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lanou.mapper.ContractMapper">
+    <select id="listAll" resultType="Contract">
+        select contract_inf.*, employee_inf.name as empname,job_inf.name as jobname,dept_inf.name as deptname
+               from contract_inf
+            left join employee_inf on employee_inf.id = contract_inf.emp_id
+            left join job_inf on job_inf.id = contract_inf.job_id
+            left join dept_inf on dept_inf.id = contract_inf.dept_id
+        <where>
+            <if test="name!=null and name != ''">
+                empname like concat('%',#{name},'%') or jonname like concat('%',#{name},'%')
+            </if>
+        </where>
+
+    </select>
+
+    <select id="findById" resultType="Contract">
+        select * from contract_inf where id = #{id}
+    </select>
+
+    <insert id="add">
+        insert into contract_inf
+            (emp_id,train_contract,labor_contract,confidentiality_contract,job_id,dept_id)
+        values
+         (#{emp_id},#{train_contract},#{labor_contract},#{confidentiality_contract},#{job_id},#{dept_id})
+    </insert>
+
+    <update id="update">
+        update contract_inf set train_contract = #{train_contract},labor_contract = #{labor_contract},
+         confidentiality_contract = #{confidentiality_contract}
+        where id = #{id}
+    </update>
+
+</mapper>
